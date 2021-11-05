@@ -1,0 +1,8 @@
+<app-clock-face></app-clock-face>
+<div [class]="styleClass$ | async">
+  <app-time-bar-part
+    *ngFor="let item of timeLogs$ | async"
+    [timeLog]="item"
+    [globalTimeRange]="globalTimeRange"
+  ></app-time-bar-part>
+</div>

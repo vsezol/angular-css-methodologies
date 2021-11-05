@@ -1,0 +1,15 @@
+{
+  "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "cursorOffset": 0,
+  "endOfLine": "lf",
+  "filepath": "none",
+  "jsxSingleQuote": true,
+  "printWidth": 120,
+  "proseWrap": "always",
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "none",
+  "useTabs": false
+}
