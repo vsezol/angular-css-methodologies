@@ -1,1 +1,31 @@
-<p>time-item works!</p>
+<div [class]="classes.root" *ngIf="timeLog$ | async as timeLog">
+  <ng-container>
+    <div [class]="classes.descriptionWrapper">
+      <app-input
+        *ngIf="isEditMode$ | async; else textBlock"
+        [class]="classes.descriptionInput"
+        (blur)="handleBlur()"
+        (enter)="handleEnter()"
+        [formControl]="descriptionControl"
+      ></app-input>
+      <ng-template #textBlock>
+        <div (click)="enableEditMode()" [class]="classes.description">{{ descriptionControl.value || 'Untitled' }}</div>
+      </ng-template>
+    </div>
+
+    <div [class]="classes.timeWrapper">
+      <div [class]="classes.timeRange">
+        <div [class]="classes.time">
+          {{ timeLog.timeRange.from | date: 'H:mm:ss' }}
+        </div>
+        <div>-</div>
+        <div [class]="classes.time">
+          {{ timeLog.timeRange.to | date: 'H:mm:ss' }}
+        </div>
+      </div>
+      <div [class]="classes.timeDiff">
+        {{ timeDiff$ | async | date: "H'h' m'm' s's'" }}
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -4,5 +4,5 @@ export interface TimeLog {
   id: string;
   isVoid: boolean;
   description: string;
-  range: TimeRange;
+  timeRange: TimeRange;
 }

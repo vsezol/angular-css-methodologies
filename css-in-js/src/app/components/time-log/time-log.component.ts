@@ -1,12 +1,133 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  AfterViewChecked,
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+  Input,
+  OnDestroy,
+  ViewChild
+} from '@angular/core';
+import { TimeLog } from 'src/app/declarations/interfaces/time-log.interface';
+import { ThemeService } from '../../services/theme.service';
+import { BehaviorSubject, distinctUntilChanged, Observable, pluck, Subject, Subscription } from 'rxjs';
+import { Nullable } from '../../declarations/types/nullable.type';
+import { isNil } from '../../functions/common/is-nil.function';
+import { filter, map, switchMap, take } from 'rxjs/operators';
+import { Today } from '../../declarations/classes/today.class';
+import { FormControl } from '@angular/forms';
+import { TimeTrackerService } from '../../services/time-tracker.service';
+import { TimeLogDTO } from '../../declarations/dto/time-log.dto';
+import { isNotNil } from '../../functions/common/is-not-nil.function';
+import { Uuid } from 'src/app/declarations/types/uuid.type';
+import { TimeLogClasses } from './time-log-classes.class';
+import { InputComponent } from '../../shared/components/input/input.component';
+import { HoverTimeLogService } from '../../services/hover-time-log.service';
 
 @Component({
-  selector: 'app-time-item',
+  selector: 'app-time-log',
   templateUrl: './time-log.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TimeLogComponent implements OnInit {
-  constructor() {}
+export class TimeLogComponent implements OnDestroy, AfterViewChecked {
+  @ViewChild(InputComponent) public inputComponent!: InputComponent;
+  private readonly inputComponent$: Subject<InputComponent> = new Subject<InputComponent>();
 
-  ngOnInit(): void {}
+  @Input()
+  public set timeLogId(value: Nullable<Uuid>) {
+    if (isNil(value)) {
+      return;
+    }
+
+    this.timeLogId$.next(value);
+  }
+
+  public readonly classes: TimeLogClasses = new TimeLogClasses(this.themeService);
+
+  public readonly isEditMode$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+  private readonly timeLogId$: BehaviorSubject<Nullable<Uuid>> = new BehaviorSubject<Nullable<Uuid>>(null);
+
+  public readonly timeLog$: Observable<TimeLog> = this.timeLogId$.pipe(
+    filter(isNotNil),
+    distinctUntilChanged(),
+    switchMap((id: Uuid) => this.timeTrackerService.getTimeLogById(id)),
+    filter(isNotNil)
+  );
+
+  public readonly timeDiff$: Observable<number> = this.timeLog$.pipe(
+    filter(isNotNil),
+    map(({ timeRange: { from, to } }: TimeLog) => to.getTime() - from.getTime()),
+    map((timeDiff: number) => new Today().start.getTime() + new Date(timeDiff).getTime())
+  );
+
+  public readonly descriptionControl: FormControl = new FormControl('');
+
+  private readonly subscription: Subscription = new Subscription();
+
+  constructor(
+    private readonly themeService: ThemeService,
+    private readonly timeTrackerService: TimeTrackerService,
+    private readonly hoverTimeLogService: HoverTimeLogService
+  ) {
+    this.initializeDescriptionControl();
+  }
+
+  public ngAfterViewChecked(): void {
+    if (isNotNil(this.inputComponent)) {
+      this.inputComponent$.next(this.inputComponent);
+    }
+  }
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  @HostListener('mouseenter')
+  public handleMouseEnter(): void {
+    this.timeLogId$.pipe(take(1), filter(isNotNil)).subscribe((id: Uuid) => {
+      this.hoverTimeLogService.setHoveredById(id);
+    });
+  }
+
+  @HostListener('mouseleave')
+  public handleMouseLeave(): void {
+    this.timeLogId$.pipe(take(1), filter(isNotNil)).subscribe((id: Uuid) => {
+      this.hoverTimeLogService.clearHoveredById(id);
+    });
+  }
+
+  public handleBlur(): void {
+    this.updateTimeLogByDescriptionControl();
+    this.disableEditMode();
+  }
+
+  public handleEnter(): void {
+    this.updateTimeLogByDescriptionControl();
+    this.disableEditMode();
+  }
+
+  public enableEditMode(): void {
+    this.isEditMode$.next(true);
+    this.inputComponent$.pipe(take(1)).subscribe((inputComponent: InputComponent) => {
+      inputComponent.doFocus();
+    });
+  }
+
+  private disableEditMode(): void {
+    this.isEditMode$.next(false);
+  }
+
+  private initializeDescriptionControl(): Subscription {
+    return this.timeLog$
+      .pipe(take(1), pluck('description'), distinctUntilChanged())
+      .subscribe((description: string) => {
+        this.descriptionControl.setValue(description);
+      });
+  }
+
+  private updateTimeLogByDescriptionControl(): void {
+    this.timeLog$.pipe(take(1)).subscribe((timeLog: TimeLog) => {
+      this.timeTrackerService.updateTimeLog(new TimeLogDTO({ ...timeLog, description: this.descriptionControl.value }));
+    });
+  }
 }

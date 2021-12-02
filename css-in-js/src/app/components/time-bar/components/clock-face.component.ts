@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { css } from '@emotion/css';
 import { ThemeService } from 'src/app/services/theme.service';
+import { TimeTrackerService } from 'src/app/services/time-tracker.service';
 
 @Component({
   selector: 'app-clock-face',
-  templateUrl: './clock-face.component.html'
+  templateUrl: './clock-face.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClockFaceComponent {
-  public get rootClass(): string {
+  get rootClass(): string {
     return css`
       display: flex;
       justify-content: space-between;
@@ -22,5 +24,5 @@ export class ClockFaceComponent {
     `;
   }
 
-  constructor(private readonly themeService: ThemeService) {}
+  constructor(private readonly themeService: ThemeService, private readonly timeTrackerService: TimeTrackerService) {}
 }

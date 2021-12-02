@@ -1,0 +1,3 @@
+<div [class]="rootClass">
+  <app-time-log *ngFor="let id of timeLogsIds$ | async; index as index" [timeLogId]="id"></app-time-log>
+</div>
