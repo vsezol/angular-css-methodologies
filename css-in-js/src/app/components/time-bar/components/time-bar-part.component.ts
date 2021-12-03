@@ -1,6 +1,5 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   HostBinding,
   Input,
@@ -33,7 +32,6 @@ interface Inputs {
 interface CreateCssClassesProps {
   timeLog: TimeLog;
   globalTimeRange: TimeRange;
-  isHover: boolean;
 }
 
 @Component({
@@ -72,10 +70,10 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
     private readonly localTimeLogsService: LocalTimeLogsService,
     private readonly hoverTimeLogService: HoverTimeLogService,
     private readonly viewRef: ViewContainerRef,
-    private readonly renderer: Renderer2,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly renderer: Renderer2
   ) {
-    this.subscription.add(this.updateHostClassWhenInputsChanged());
+    this.setHostClasses();
+    this.subscription.add(this.processIsHoverHostClassWhenIsHoverChanged());
   }
 
   public ngOnChanges(changes: ComponentChanges<this>): void {
@@ -92,25 +90,23 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
     });
   }
 
-  private updateHostClassWhenInputsChanged(): Subscription {
-    return combineLatest([
+  private setHostClasses(): void {
+    combineLatest([
       this.inputs$.pipe(filter((inputs: Inputs) => isNotNil(inputs.timeLogId) && !isEmpty(inputs.globalTimeRange))),
-      this.timeLog$,
-      this.isHover$
+      this.timeLog$
     ])
       .pipe(
-        map(([inputs, timeLog, isHover]: [Inputs, TimeLog, boolean]) => {
+        take(1),
+        map(([inputs, timeLog]: [Inputs, TimeLog]) => {
           return {
             globalTimeRange: inputs.globalTimeRange,
-            timeLog,
-            isHover
+            timeLog
           };
         }),
         map((props: CreateCssClassesProps) => this.getHostClasses(props))
       )
       .subscribe((hostClasses: string[]) => {
         this.hostClasses = hostClasses;
-        this.changeDetectorRef.markForCheck();
       });
   }
 
@@ -156,15 +152,6 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
       `
     );
 
-    if (props.isHover) {
-      classes.push(
-        css`
-          transition: background-color 50ms ease-out;
-          background-color: ${this.themeService.getColor(['warning', 200])};
-        `
-      );
-    }
-
     if (!props.timeLog.isVoid) {
       classes.push(css`
         cursor: pointer;
@@ -177,6 +164,22 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
 
     return classes;
   }
+
+  private processIsHoverHostClassWhenIsHoverChanged(): Subscription {
+    return this.isHover$.subscribe((isHover: boolean) => {
+      if (isHover) {
+        this.renderer.addClass(this.viewRef.element.nativeElement, this.isHoverClass);
+        return;
+      }
+
+      this.renderer.removeClass(this.viewRef.element.nativeElement, this.isHoverClass);
+    });
+  }
+
+  private readonly isHoverClass: string = css`
+    transition: background-color 50ms ease-out !important;
+    background-color: ${this.themeService.getColor(['warning', 200])} !important;
+  `;
 
   private getWidthInPercents(localTimeRange: TimeRange, fullTimeRange: TimeRange): number {
     const getDiff = (timeRange: TimeRange) => timeRange.to.getTime() - timeRange.from.getTime();
