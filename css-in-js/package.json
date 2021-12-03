@@ -4,7 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "gzipper": "gzipper",
     "build": "ng build",
+    "gzip-build": "gzipper compress ./dist ./dist/gzipped",
+    "build:gzip": "yarn build && yarn gzip-build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "format": "yarn prettier --write ."
