@@ -7,8 +7,7 @@ import { TimeLogComponent } from './components/time-log/time-log.component';
 import { TimeBarComponent } from './components/time-bar/time-bar.component';
 import { THEME_CONFIG_TOKEN } from './constants/tokens/theme-config.token';
 import { themeConfig } from './configs/theme.config';
-import { TimeBarPartComponent } from './components/time-bar/components/time-bar-part.component';
-import { ClockFaceComponent } from './components/time-bar/components/clock-face.component';
+import { TimeBarPartComponent } from './components/time-bar/components/time-bar-part/time-bar-part.component';
 import { TimeRunnerComponent } from './components/time-runner/time-runner.component';
 import { SharedModule } from './shared/shared.module';
 import { ControlBarComponent } from './components/control-bar/control-bar.component';
@@ -20,7 +19,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     AppComponent,
     TimeBarComponent,
     TimeBarPartComponent,
-    ClockFaceComponent,
     TimeRunnerComponent,
     ControlBarComponent,
     TimeLogComponent,

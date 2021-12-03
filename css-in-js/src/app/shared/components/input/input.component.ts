@@ -11,12 +11,12 @@ import {
   ViewChild
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { css } from '@emotion/css';
 import { ThemeService } from 'src/app/services/theme.service';
 import { BehaviorSubject } from 'rxjs';
 import { Nullable } from '../../../declarations/types/nullable.type';
 import { filter, take } from 'rxjs/operators';
 import { isNotNil } from '../../../functions/common/is-not-nil.function';
+import { InputClasses } from './input-classes.class';
 
 @Component({
   selector: 'app-input',
@@ -39,8 +39,10 @@ export class InputComponent implements ControlValueAccessor, AfterViewInit {
   @Output() public focus: EventEmitter<FocusEvent> = new EventEmitter<FocusEvent>();
   @Output() public blur: EventEmitter<FocusEvent> = new EventEmitter<FocusEvent>();
   @Output() public enter: EventEmitter<Event> = new EventEmitter<Event>();
-  public readonly isTouched$: BehaviorSubject<Nullable<boolean>> = new BehaviorSubject<Nullable<boolean>>(null);
+
   public readonly isFocused$: BehaviorSubject<Nullable<boolean>> = new BehaviorSubject<Nullable<boolean>>(null);
+
+  public readonly classes: InputClasses = new InputClasses(this.themeService);
 
   private _value: unknown;
 
@@ -55,24 +57,7 @@ export class InputComponent implements ControlValueAccessor, AfterViewInit {
   }
 
   @HostBinding('class')
-  public readonly hostClass: string = css`
-    width: 100%;
-  `;
-
-  public readonly inputClass: string = css`
-    background: transparent;
-    box-sizing: border-box;
-    border: none;
-    margin: 0;
-    padding: 0;
-    outline: none;
-    color: ${this.themeService.getColor('light')};
-    width: 100%;
-    font-size: 0.8rem;
-
-    line-height: 35px;
-    height: 35px;
-  `;
+  public readonly hostClass: string = this.classes.host;
 
   constructor(private readonly themeService: ThemeService) {}
 

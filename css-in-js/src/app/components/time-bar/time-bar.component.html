@@ -1,4 +1,4 @@
-<div [class]="styleClass$ | async">
+<div [class]="classes.root">
   <app-time-bar-part
     *ngFor="let id of timeLogsIds$ | async"
     [timeLogId]="id"

@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { TimeLog } from 'src/app/declarations/interfaces/time-log.interface';
 import { ThemeService } from '../../services/theme.service';
-import { BehaviorSubject, distinctUntilChanged, Observable, pluck, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, Observable, pluck, ReplaySubject, Subject, Subscription } from 'rxjs';
 import { Nullable } from '../../declarations/types/nullable.type';
 import { isNil } from '../../functions/common/is-nil.function';
 import { filter, map, switchMap, take } from 'rxjs/operators';
@@ -21,7 +21,7 @@ import { isNotNil } from '../../functions/common/is-not-nil.function';
 import { Uuid } from 'src/app/declarations/types/uuid.type';
 import { TimeLogClasses } from './time-log-classes.class';
 import { InputComponent } from '../../shared/components/input/input.component';
-import { HoverTimeLogService } from '../../services/hover-time-log.service';
+import { ActiveTimeLogService } from '../../services/active-time-log.service';
 
 @Component({
   selector: 'app-time-log',
@@ -45,10 +45,9 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
 
   public readonly isEditMode$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  private readonly timeLogId$: BehaviorSubject<Nullable<Uuid>> = new BehaviorSubject<Nullable<Uuid>>(null);
+  private readonly timeLogId$: ReplaySubject<Uuid> = new ReplaySubject<Uuid>(1);
 
   public readonly timeLog$: Observable<TimeLog> = this.timeLogId$.pipe(
-    filter(isNotNil),
     distinctUntilChanged(),
     switchMap((id: Uuid) => this.timeTrackerService.getTimeLogById(id)),
     filter(isNotNil)
@@ -67,7 +66,7 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
   constructor(
     private readonly themeService: ThemeService,
     private readonly timeTrackerService: TimeTrackerService,
-    private readonly hoverTimeLogService: HoverTimeLogService
+    private readonly hoverTimeLogService: ActiveTimeLogService
   ) {
     this.initializeDescriptionControl();
   }
@@ -84,16 +83,19 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
 
   @HostListener('mouseenter')
   public handleMouseEnter(): void {
-    this.timeLogId$.pipe(take(1), filter(isNotNil)).subscribe((id: Uuid) => {
-      this.hoverTimeLogService.setHoveredById(id);
-    });
+    this.setActiveTimeLog();
   }
 
   @HostListener('mouseleave')
   public handleMouseLeave(): void {
-    this.timeLogId$.pipe(take(1), filter(isNotNil)).subscribe((id: Uuid) => {
-      this.hoverTimeLogService.clearHoveredById(id);
-    });
+    this.isEditMode$
+      .pipe(
+        take(1),
+        filter((isEditMode: boolean) => !isEditMode)
+      )
+      .subscribe(() => {
+        this.clearActiveTimeLog();
+      });
   }
 
   public handleBlur(): void {
@@ -108,6 +110,7 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
 
   public enableEditMode(): void {
     this.isEditMode$.next(true);
+    this.setActiveTimeLog();
     this.inputComponent$.pipe(take(1)).subscribe((inputComponent: InputComponent) => {
       inputComponent.doFocus();
     });
@@ -115,6 +118,7 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
 
   private disableEditMode(): void {
     this.isEditMode$.next(false);
+    this.clearActiveTimeLog();
   }
 
   private initializeDescriptionControl(): Subscription {
@@ -128,6 +132,18 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
   private updateTimeLogByDescriptionControl(): void {
     this.timeLog$.pipe(take(1)).subscribe((timeLog: TimeLog) => {
       this.timeTrackerService.updateTimeLog(new TimeLogDTO({ ...timeLog, description: this.descriptionControl.value }));
+    });
+  }
+
+  private setActiveTimeLog(): void {
+    this.timeLogId$.pipe(take(1)).subscribe((id: Uuid) => {
+      this.hoverTimeLogService.setActiveById(id);
+    });
+  }
+
+  private clearActiveTimeLog(): void {
+    this.timeLogId$.pipe(take(1)).subscribe((id: Uuid) => {
+      this.hoverTimeLogService.clearActiveById(id);
     });
   }
 }

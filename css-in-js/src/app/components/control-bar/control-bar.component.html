@@ -1,4 +1,4 @@
-<div [class]="styleClasses">
+<div [class]="classes.root">
   <div>Total time: {{ totalTimeSpent$ | async | date: "H'h' m'm' s's'" }}</div>
   <app-time-runner (stateChange)="handleStateChange($event)"></app-time-runner>
 </div>

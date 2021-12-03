@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import { ThemeService } from '../../services/theme.service';
-import { getOverflowEllipsisStyles } from '../../functions/styles/get-overflow-ellipsis-styles.function';
+import { OVERFLOW_ELLIPSIS_STYLE } from '../../constants/style/overflow-ellipsis.style';
 
 export class TimeLogClasses {
   private readonly minHeight: string = '40px';
@@ -58,7 +58,7 @@ export class TimeLogClasses {
     margin-right: 20px;
     width: 100%;
     height: inherit;
-    ${getOverflowEllipsisStyles()};
+    ${OVERFLOW_ELLIPSIS_STYLE};
   `;
 
   public readonly descriptionInput: string = css`
@@ -69,7 +69,7 @@ export class TimeLogClasses {
   public readonly description: string = css`
     font-size: ${this.fontSize};
     white-space: nowrap;
-    ${getOverflowEllipsisStyles()};
+    ${OVERFLOW_ELLIPSIS_STYLE};
     width: 100%;
     content: '';
     min-height: ${this.minHeight};

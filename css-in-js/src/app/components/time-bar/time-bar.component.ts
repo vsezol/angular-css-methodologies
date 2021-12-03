@@ -8,6 +8,7 @@ import { ThemeService } from 'src/app/services/theme.service';
 import { LocalTimeLogsService } from './services/local-time-logs.service';
 import { Uuid } from '../../declarations/types/uuid.type';
 import { TimeLog } from '../../declarations/interfaces/time-log.interface';
+import { TimeBarClasses } from './time-bar-classes.class';
 
 @Component({
   selector: 'app-time-bar',
@@ -21,17 +22,7 @@ export class TimeBarComponent {
 
   public readonly globalTimeRange$: Observable<TimeRange> = this.timeTrackerService.globalTimeRange$;
 
-  public readonly styleClass$: Observable<string> = this.timeLogs$.pipe(
-    map(() => {
-      return css`
-        display: flex;
-        width: 100%;
-        min-height: 40px;
-        box-sizing: border-box;
-        background-color: ${this.themeService.getColor(['dark', 300])};
-      `;
-    })
-  );
+  public readonly classes: TimeBarClasses = new TimeBarClasses(this.themeService);
 
   constructor(
     private readonly timeTrackerService: TimeTrackerService,

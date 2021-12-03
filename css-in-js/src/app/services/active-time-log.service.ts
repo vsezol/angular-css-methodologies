@@ -8,25 +8,25 @@ import { isNotNil } from '../functions/common/is-not-nil.function';
 @Injectable({
   providedIn: 'root'
 })
-export class HoverTimeLogService {
-  private readonly hoveredTimeLogIdState$: BehaviorSubject<Nullable<Uuid>> = new BehaviorSubject<Nullable<Uuid>>(null);
-  public readonly hoveredTimeLogId$: Observable<Nullable<Uuid>> = this.hoveredTimeLogIdState$
+export class ActiveTimeLogService {
+  private readonly activeTimeLogIdState$: BehaviorSubject<Nullable<Uuid>> = new BehaviorSubject<Nullable<Uuid>>(null);
+  public readonly activeTimeLogId$: Observable<Nullable<Uuid>> = this.activeTimeLogIdState$
     .asObservable()
     .pipe(distinctUntilChanged());
 
-  public setHoveredById(id: Uuid): void {
-    this.hoveredTimeLogIdState$.next(id);
+  public setActiveById(id: Uuid): void {
+    this.activeTimeLogIdState$.next(id);
   }
 
-  public clearHoveredById(id: Uuid): void {
-    this.hoveredTimeLogIdState$
+  public clearActiveById(id: Uuid): void {
+    this.activeTimeLogIdState$
       .pipe(
         take(1),
         filter(isNotNil),
         filter((currentId: Uuid) => currentId === id)
       )
       .subscribe(() => {
-        this.hoveredTimeLogIdState$.next(null);
+        this.activeTimeLogIdState$.next(null);
       });
   }
 }

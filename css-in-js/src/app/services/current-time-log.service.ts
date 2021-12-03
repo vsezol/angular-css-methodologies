@@ -10,7 +10,7 @@ import { TimeRangeDTO } from '../declarations/dto/time-range.dto';
 import { isNil } from '../functions/common/is-nil.function';
 import { isNotNil } from '../functions/common/is-not-nil.function';
 
-const MIN_DIFF_TO_REMOVE: number = 1000;
+const MIN_DIFF_TO_REMOVE: number = 30000;
 
 @Injectable({
   providedIn: 'root'

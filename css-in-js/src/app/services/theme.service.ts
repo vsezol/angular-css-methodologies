@@ -11,11 +11,11 @@ export class ThemeService {
 
   public getColor(path: ColorPath): string {
     if (typeof path === 'string') {
-      return this.themeConfig.colors[path]['0'];
+      return this.themeConfig.colors[path][0];
     }
 
     if (Array.isArray(path) && path.length === 1) {
-      return this.themeConfig.colors[path[0]]['0'];
+      return this.themeConfig.colors[path[0]][0];
     }
 
     return this.themeConfig.colors[path[0]][path[1]];

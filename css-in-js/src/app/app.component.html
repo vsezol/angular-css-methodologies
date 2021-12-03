@@ -1,10 +1,10 @@
-<div [class]="rootClass">
-  <div [class]="wrapperClass">
-    <div [class]="controlBarWrapperClass">
+<div [class]="classes.root">
+  <div [class]="classes.wrapper">
+    <div [class]="classes.controlBarWrapper">
       <app-control-bar></app-control-bar>
     </div>
     <app-time-bar></app-time-bar>
-    <div [class]="timeLogsListWrapperClass">
+    <div [class]="classes.timeLogsListWrapper">
       <app-time-logs-list></app-time-logs-list>
     </div>
   </div>

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { css, injectGlobal } from '@emotion/css';
+import { injectGlobal } from '@emotion/css';
 import { ThemeService } from './services/theme.service';
+import { AppClasses } from './app-classes.class';
 
 @Component({
   selector: 'app-root',
@@ -8,43 +9,13 @@ import { ThemeService } from './services/theme.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
-  public get rootClass(): string {
-    return css`
-      background-color: ${this.themeService.getColor(['dark', 100])};
-      height: 100vh;
-      width: 100vw;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    `;
-  }
-
-  public get wrapperClass(): string {
-    return css`
-      width: 100%;
-      max-width: 1440px;
-      padding: 20px;
-      box-sizing: border-box;
-    `;
-  }
-
-  public get controlBarWrapperClass(): string {
-    return css`
-      margin-bottom: 1rem;
-    `;
-  }
-
-  public get timeLogsListWrapperClass(): string {
-    return css`
-      padding: 20px 0px 0px 0px;
-    `;
-  }
+  public readonly classes: AppClasses = new AppClasses(this.themeService);
 
   constructor(private readonly themeService: ThemeService) {
-    this.setGlobalStyles();
+    this.injectGlobalStyles();
   }
 
-  private setGlobalStyles(): void {
+  public injectGlobalStyles(): void {
     injectGlobal`
       * {
         box-sizing: border-box;

@@ -8,29 +8,23 @@ import {
   Renderer2,
   ViewContainerRef
 } from '@angular/core';
-import { TimeRange } from '../../../declarations/interfaces/time-range.interface';
-import { TimeLog } from '../../../declarations/interfaces/time-log.interface';
-import { ComponentChanges } from '../../../declarations/interfaces/component-changes.interface';
+import { TimeRange } from '../../../../declarations/interfaces/time-range.interface';
+import { TimeLog } from '../../../../declarations/interfaces/time-log.interface';
+import { ComponentChanges } from '../../../../declarations/interfaces/component-changes.interface';
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, map, pluck, switchMap, take } from 'rxjs/operators';
-import { css } from '@emotion/css';
-import { updateByChanges } from '../../../functions/common/update-by-changes.function';
-import { isEmpty } from '../../../functions/common/is-empty.function';
-import { ThemeService } from '../../../services/theme.service';
+import { updateByChanges } from '../../../../functions/common/update-by-changes.function';
+import { isEmpty } from '../../../../functions/common/is-empty.function';
+import { ThemeService } from '../../../../services/theme.service';
 import { Uuid } from 'src/app/declarations/types/uuid.type';
 import { isNotNil } from 'src/app/functions/common/is-not-nil.function';
-import { getOverflowEllipsisStyles } from '../../../functions/styles/get-overflow-ellipsis-styles.function';
-import { LocalTimeLogsService } from '../services/local-time-logs.service';
-import { HoverTimeLogService } from '../../../services/hover-time-log.service';
-import { Nullable } from '../../../declarations/types/nullable.type';
+import { LocalTimeLogsService } from '../../services/local-time-logs.service';
+import { ActiveTimeLogService } from '../../../../services/active-time-log.service';
+import { Nullable } from '../../../../declarations/types/nullable.type';
+import { TimeBarPartClasses } from './time-bar-part-classes.class';
 
 interface Inputs {
   timeLogId: Uuid;
-  globalTimeRange: TimeRange;
-}
-
-interface CreateCssClassesProps {
-  timeLog: TimeLog;
   globalTimeRange: TimeRange;
 }
 
@@ -43,6 +37,8 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
   @Input() public timeLogId!: Uuid;
   @Input() public globalTimeRange!: TimeRange;
 
+  public readonly classes: TimeBarPartClasses = new TimeBarPartClasses(this.themeService);
+
   public readonly inputs$: BehaviorSubject<Inputs> = new BehaviorSubject<Inputs>({
     timeLogId: this.timeLogId,
     globalTimeRange: this.globalTimeRange
@@ -50,7 +46,7 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
 
   private readonly isHover$: Observable<boolean> = combineLatest([
     this.inputs$.pipe(map(({ timeLogId }: Inputs) => timeLogId)),
-    this.hoverTimeLogService.hoveredTimeLogId$
+    this.hoverTimeLogService.activeTimeLogId$
   ]).pipe(map(([id, hoverId]: [Uuid, Nullable<Uuid>]) => isNotNil(hoverId) && id === hoverId));
 
   public readonly timeLog$: Observable<TimeLog> = this.inputs$.pipe(
@@ -68,7 +64,7 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
   constructor(
     private readonly themeService: ThemeService,
     private readonly localTimeLogsService: LocalTimeLogsService,
-    private readonly hoverTimeLogService: HoverTimeLogService,
+    private readonly hoverTimeLogService: ActiveTimeLogService,
     private readonly viewRef: ViewContainerRef,
     private readonly renderer: Renderer2
   ) {
@@ -98,88 +94,27 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
       .pipe(
         take(1),
         map(([inputs, timeLog]: [Inputs, TimeLog]) => {
-          return {
-            globalTimeRange: inputs.globalTimeRange,
-            timeLog
-          };
-        }),
-        map((props: CreateCssClassesProps) => this.getHostClasses(props))
+          return this.classes.getBaseHost({
+            isVoid: timeLog.isVoid,
+            width: this.getWidthInPercents(timeLog.timeRange, inputs.globalTimeRange)
+          });
+        })
       )
       .subscribe((hostClasses: string[]) => {
         this.hostClasses = hostClasses;
       });
   }
 
-  private getHostClasses(props: CreateCssClassesProps): string[] {
-    const classes: string[] = [];
-
-    const bg: string = props.timeLog.isVoid ? 'transparent' : this.themeService.getColor(['primary', 0]);
-
-    classes.push(
-      css`
-        content: '';
-        overflow: hidden;
-        width: 100%;
-        box-sizing: border-box;
-        padding: 0px 0px;
-        height: 40px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: background-color 0.2s ease-out, flex 0.5s ease-out;
-
-        .text {
-          display: block;
-          content: '';
-          white-space: nowrap;
-          ${getOverflowEllipsisStyles()};
-          overflow: hidden;
-          font-size: 0.8rem;
-          color: ${this.themeService.getColor(['light', 100])};
-        }
-      `
-    );
-
-    classes.push(
-      css`
-        flex: 0 0 ${this.getWidthInPercents(props.timeLog.timeRange, this.globalTimeRange)}%;
-      `
-    );
-
-    classes.push(
-      css`
-        background-color: ${bg};
-      `
-    );
-
-    if (!props.timeLog.isVoid) {
-      classes.push(css`
-        cursor: pointer;
-
-        :hover {
-          background-color: ${this.themeService.getColor(['primary', 200])};
-        }
-      `);
-    }
-
-    return classes;
-  }
-
   private processIsHoverHostClassWhenIsHoverChanged(): Subscription {
     return this.isHover$.subscribe((isHover: boolean) => {
       if (isHover) {
-        this.renderer.addClass(this.viewRef.element.nativeElement, this.isHoverClass);
+        this.renderer.addClass(this.viewRef.element.nativeElement, this.classes.highlightHost);
         return;
       }
 
-      this.renderer.removeClass(this.viewRef.element.nativeElement, this.isHoverClass);
+      this.renderer.removeClass(this.viewRef.element.nativeElement, this.classes.highlightHost);
     });
   }
-
-  private readonly isHoverClass: string = css`
-    transition: background-color 50ms ease-out !important;
-    background-color: ${this.themeService.getColor(['warning', 200])} !important;
-  `;
 
   private getWidthInPercents(localTimeRange: TimeRange, fullTimeRange: TimeRange): number {
     const getDiff = (timeRange: TimeRange) => timeRange.to.getTime() - timeRange.from.getTime();
