@@ -1,8 +1,7 @@
-import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, HostBinding, Inject } from '@angular/core';
-import { css, injectGlobal } from '@emotion/css';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { injectGlobal } from '@emotion/css';
 import { ThemeService } from './services/theme.service';
-import { TimeTrackerService } from './services/time-tracker.service';
+import { AppClasses } from './app-classes.class';
 
 @Component({
   selector: 'app-root',
@@ -10,30 +9,13 @@ import { TimeTrackerService } from './services/time-tracker.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
-  public get rootClass(): string {
-    return css`
-      background-color: ${this.themeService.getColor(['dark', 100])};
-      height: 100vh;
-      width: 100vw;
-      display: flex;
-      justify-content: center;
-    `;
-  }
-
-  public get wrapperClass(): string {
-    return css`
-      width: 100%;
-      max-width: 1440px;
-      padding: 20px;
-      box-sizing: border-box;
-    `;
-  }
+  public readonly classes: AppClasses = new AppClasses(this.themeService);
 
   constructor(private readonly themeService: ThemeService) {
-    this.setGlobalStyles();
+    this.injectGlobalStyles();
   }
 
-  private setGlobalStyles(): void {
+  public injectGlobalStyles(): void {
     injectGlobal`
       * {
         box-sizing: border-box;
@@ -48,11 +30,13 @@ export class AppComponent {
       @font-face {
         font-family: roboto-regular;
         src: local("Roboto Regular"), url(../assets/fonts/roboto/Roboto-Regular.ttf);
+        font-display: swap;
       }
 
       @font-face {
         font-family: roboto-bold;
         src: local("Roboto Regular"), url(../assets/fonts/roboto/Roboto-Bold.ttf);
+        font-display: swap;
       }
     `;
   }
