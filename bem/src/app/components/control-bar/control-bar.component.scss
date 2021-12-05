@@ -1,0 +1,9 @@
+@use 'src/styles/variables' as *;
+@use 'src/styles/functions' as *;
+
+.control-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: get-map-field($colors, [light, 100]);
+}

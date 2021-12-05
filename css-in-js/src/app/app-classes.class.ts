@@ -18,13 +18,14 @@ export class AppClasses {
     box-sizing: border-box;
   `;
 
-  public readonly controlBarWrapper: string = css`
+  public readonly barWrapper: string = css`
     margin-bottom: 1rem;
   `;
 
-  public readonly timeLogsListWrapper: string = css`
+  public readonly listWrapper: string = css`
     margin-top: 1rem;
   `;
 
-  constructor(private readonly themeService: ThemeService) {}
+  constructor(private readonly themeService: ThemeService) {
+  }
 }

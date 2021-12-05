@@ -1,0 +1,36 @@
+@use 'src/styles/variables' as *;
+@use 'src/styles/functions' as *;
+
+.button {
+  cursor: pointer;
+  transition: all 0.2s;
+  height: 35px;
+  min-width: 70px;
+  box-sizing: border-box;
+  color: get-map-field($colors, [light, 0]);
+  border: none;
+
+  &_primary {
+    background-color: get-map-field($colors, [primary, 0]);
+
+    &:hover {
+      background-color: get-map-field($colors, [primary, 100]);
+    }
+  }
+
+  &_secondary {
+    background-color: get-map-field($colors, [secondary, 500]);
+
+    &:hover {
+      background-color: get-map-field($colors, [secondary, 400]);
+    }
+  }
+
+  &_danger {
+    background-color: get-map-field($colors, [danger, 0]);
+
+    &:hover {
+      background-color: get-map-field($colors, [danger, 100]);
+    }
+  }
+}

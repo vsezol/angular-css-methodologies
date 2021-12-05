@@ -1,0 +1,48 @@
+@use 'src/styles/variables' as *;
+@use 'src/styles/functions' as *;
+@use 'src/styles/mixins' as *;
+
+:host {
+  content: '';
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0px 0px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.2s ease-out, flex 0.5s ease-out;
+
+  cursor: pointer;
+  background-color: get-map-field($colors, [primary, 0]);
+
+  &:hover {
+    background-color: get-map-field($colors, [primary, 200]);
+  }
+
+  &.void {
+    background-color: transparent;
+
+    &:hover {
+      cursor: default;
+      background-color: transparent;
+    }
+  }
+
+  &.highlight {
+    transition: 0s;
+    background-color: get-map-field($colors, [accent, 400]);
+  }
+}
+
+.time-bar-part {
+  @include overflow-ellipsis;
+
+  display: block;
+  content: '';
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 0.8rem;
+  color: get-map-field($colors, [light, 100]);
+}

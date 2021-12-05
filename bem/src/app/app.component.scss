@@ -1,0 +1,26 @@
+@use 'src/styles/variables' as *;
+@use 'src/styles/functions' as *;
+
+.app {
+  background-color: get-map-field($colors, [dark, 100]);
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__wrapper {
+    width: 100%;
+    max-width: 1440px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  &__bar-wrapper {
+    margin-bottom: 1rem;
+  }
+
+  &__list-wrapper {
+    margin-top: 1rem;
+  }
+}
