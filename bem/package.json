@@ -4,7 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "gzipper": "gzipper",
     "build": "ng build",
+    "gzip-build": "gzipper compress ./dist ./dist/gzipped",
+    "build:gzip": "yarn build && yarn gzip-build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -30,6 +33,7 @@
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
     "@types/uuid": "^8.3.3",
+    "gzipper": "^6.0.0",
     "jasmine-core": "~3.10.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
