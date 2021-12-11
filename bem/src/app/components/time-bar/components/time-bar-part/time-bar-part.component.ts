@@ -54,7 +54,6 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
 
   private readonly subscription: Subscription = new Subscription();
 
-
   constructor(
     private readonly localTimeLogsService: LocalTimeLogsService,
     private readonly hoverTimeLogService: ActiveTimeLogService,
@@ -84,9 +83,7 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
       this.inputs$.pipe(filter((inputs: Inputs) => isNotNil(inputs.timeLogId) && !isEmpty(inputs.globalTimeRange))),
       this.timeLog$
     ])
-      .pipe(
-        take(1)
-      )
+      .pipe(take(1))
       .subscribe(([inputs, timeLog]: [Inputs, TimeLog]) => {
         this.setHostWidth(this.getWidthInPercents(timeLog.timeRange, inputs.globalTimeRange));
         this.processVoidHostClass(timeLog.isVoid);

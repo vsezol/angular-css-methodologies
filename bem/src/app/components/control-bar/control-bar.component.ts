@@ -21,8 +21,7 @@ export class ControlBarComponent {
   constructor(
     private readonly timeTrackerService: TimeTrackerService,
     private readonly currentTimeLogService: CurrentTimeLogService
-  ) {
-  }
+  ) {}
 
   public handleStateChange(state: TimeRunnerState): void {
     if (state === 'start') {

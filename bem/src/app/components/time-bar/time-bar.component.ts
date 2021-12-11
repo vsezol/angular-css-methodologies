@@ -22,6 +22,5 @@ export class TimeBarComponent {
   constructor(
     private readonly timeTrackerService: TimeTrackerService,
     private readonly localTimeLogsService: LocalTimeLogsService
-  ) {
-  }
+  ) {}
 }

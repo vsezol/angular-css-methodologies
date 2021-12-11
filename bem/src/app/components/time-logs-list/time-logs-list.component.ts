@@ -15,6 +15,5 @@ export class TimeLogsListComponent {
     .getTimeLogs()
     .pipe(map((timeLogs: TimeLog[]) => timeLogs.map((item: TimeLog) => item.id)));
 
-  constructor(private readonly timeTrackerService: TimeTrackerService) {
-  }
+  constructor(private readonly timeTrackerService: TimeTrackerService) {}
 }

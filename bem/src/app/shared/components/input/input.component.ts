@@ -84,8 +84,7 @@ export class InputComponent implements ControlValueAccessor, AfterViewInit {
     });
   }
 
-  public onChange(value: unknown): void {
-  }
+  public onChange(value: unknown): void {}
 
   public writeValue(value: unknown): void {
     this.value = value;
@@ -95,6 +94,5 @@ export class InputComponent implements ControlValueAccessor, AfterViewInit {
     this.onChange = fn;
   }
 
-  public registerOnTouched(): void {
-  }
+  public registerOnTouched(): void {}
 }

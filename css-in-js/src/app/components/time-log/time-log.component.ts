@@ -2,14 +2,24 @@ import {
   AfterViewChecked,
   ChangeDetectionStrategy,
   Component,
-  HostListener,
   Input,
+  NgZone,
   OnDestroy,
-  ViewChild
+  ViewChild,
+  ViewContainerRef
 } from '@angular/core';
 import { TimeLog } from 'src/app/declarations/interfaces/time-log.interface';
 import { ThemeService } from '../../services/theme.service';
-import { BehaviorSubject, distinctUntilChanged, Observable, pluck, ReplaySubject, Subject, Subscription } from 'rxjs';
+import {
+  BehaviorSubject,
+  distinctUntilChanged,
+  fromEvent,
+  Observable,
+  pluck,
+  ReplaySubject,
+  Subject,
+  Subscription
+} from 'rxjs';
 import { Nullable } from '../../declarations/types/nullable.type';
 import { isNil } from '../../functions/common/is-nil.function';
 import { filter, map, switchMap, take } from 'rxjs/operators';
@@ -66,9 +76,14 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
   constructor(
     private readonly themeService: ThemeService,
     private readonly timeTrackerService: TimeTrackerService,
-    private readonly hoverTimeLogService: ActiveTimeLogService
+    private readonly hoverTimeLogService: ActiveTimeLogService,
+    private readonly ngZone: NgZone,
+    private readonly viewContainerRef: ViewContainerRef
   ) {
     this.initializeDescriptionControl();
+
+    this.subscription.add(this.handleMouseEnter());
+    this.subscription.add(this.handleMouseLeave());
   }
 
   public ngAfterViewChecked(): void {
@@ -79,23 +94,6 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
 
   public ngOnDestroy(): void {
     this.subscription.unsubscribe();
-  }
-
-  @HostListener('mouseenter')
-  public handleMouseEnter(): void {
-    this.setActiveTimeLog();
-  }
-
-  @HostListener('mouseleave')
-  public handleMouseLeave(): void {
-    this.isEditMode$
-      .pipe(
-        take(1),
-        filter((isEditMode: boolean) => !isEditMode)
-      )
-      .subscribe(() => {
-        this.clearActiveTimeLog();
-      });
   }
 
   public handleBlur(): void {
@@ -144,6 +142,25 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
   private clearActiveTimeLog(): void {
     this.timeLogId$.pipe(take(1)).subscribe((id: Uuid) => {
       this.hoverTimeLogService.clearActiveById(id);
+    });
+  }
+
+  private handleMouseEnter(): Subscription {
+    return fromEvent(this.viewContainerRef.element.nativeElement, 'mouseenter').subscribe(() => {
+      this.setActiveTimeLog();
+    });
+  }
+
+  private handleMouseLeave(): Subscription {
+    return fromEvent(this.viewContainerRef.element.nativeElement, 'mouseleave').subscribe(() => {
+      this.isEditMode$
+        .pipe(
+          take(1),
+          filter((isEditMode: boolean) => !isEditMode)
+        )
+        .subscribe(() => {
+          this.clearActiveTimeLog();
+        });
     });
   }
 }

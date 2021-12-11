@@ -35,6 +35,5 @@ export class AppClasses {
     margin-top: 1rem;
   `;
 
-  constructor(private readonly themeService: ThemeService) {
-  }
+  constructor(private readonly themeService: ThemeService) {}
 }

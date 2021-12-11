@@ -8,6 +8,10 @@ body {
   margin: 0;
 }
 
+:root {
+  color-scheme: dark;
+}
+
 @font-face {
   font-family: roboto-regular;
   src: local("Roboto Regular"), url(../assets/fonts/roboto/Roboto-Regular.ttf);

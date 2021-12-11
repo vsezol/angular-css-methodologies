@@ -23,6 +23,10 @@ export class AppComponent {
         font-size: 1rem;
       }
 
+      :root {
+        color-scheme: dark;
+      }
+
       body {
         margin: 0;
       }

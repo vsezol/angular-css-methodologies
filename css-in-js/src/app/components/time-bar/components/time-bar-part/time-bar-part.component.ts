@@ -69,7 +69,7 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
     private readonly renderer: Renderer2
   ) {
     this.setHostClasses();
-    this.subscription.add(this.processIsHoverHostClassWhenIsHoverChanged());
+    this.subscription.add(this.processHostClassWhenIsHoverChanged());
   }
 
   public ngOnChanges(changes: ComponentChanges<this>): void {
@@ -105,7 +105,7 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
       });
   }
 
-  private processIsHoverHostClassWhenIsHoverChanged(): Subscription {
+  private processHostClassWhenIsHoverChanged(): Subscription {
     return this.isHover$.subscribe((isHover: boolean) => {
       if (isHover) {
         this.renderer.addClass(this.viewRef.element.nativeElement, this.classes.highlightHost);

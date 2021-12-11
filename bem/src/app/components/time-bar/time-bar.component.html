@@ -1,7 +1,7 @@
-<div class='time-bar'>
+<div class="time-bar">
   <app-time-bar-part
-    *ngFor='let id of timeLogsIds$ | async'
-    [timeLogId]='id'
-    [globalTimeRange]='(globalTimeRange$ | async)!'
+    *ngFor="let id of timeLogsIds$ | async"
+    [timeLogId]="id"
+    [globalTimeRange]="(globalTimeRange$ | async)!"
   ></app-time-bar-part>
 </div>
