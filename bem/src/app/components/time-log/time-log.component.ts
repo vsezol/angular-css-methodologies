@@ -9,7 +9,6 @@ import {
   ViewContainerRef
 } from '@angular/core';
 import { TimeLog } from 'src/app/declarations/interfaces/time-log.interface';
-import { ThemeService } from '../../services/theme.service';
 import {
   BehaviorSubject,
   distinctUntilChanged,
@@ -29,13 +28,13 @@ import { TimeTrackerService } from '../../services/time-tracker.service';
 import { TimeLogDTO } from '../../declarations/dto/time-log.dto';
 import { isNotNil } from '../../functions/common/is-not-nil.function';
 import { Uuid } from 'src/app/declarations/types/uuid.type';
-import { TimeLogClasses } from './time-log-classes.class';
 import { InputComponent } from '../../shared/components/input/input.component';
 import { ActiveTimeLogService } from '../../services/active-time-log.service';
 
 @Component({
   selector: 'app-time-log',
   templateUrl: './time-log.component.html',
+  styleUrls: ['./time-log.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TimeLogComponent implements OnDestroy, AfterViewChecked {
@@ -50,8 +49,6 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
 
     this.timeLogId$.next(value);
   }
-
-  public readonly classes: TimeLogClasses = new TimeLogClasses(this.themeService);
 
   public readonly isEditMode$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -74,7 +71,6 @@ export class TimeLogComponent implements OnDestroy, AfterViewChecked {
   private readonly subscription: Subscription = new Subscription();
 
   constructor(
-    private readonly themeService: ThemeService,
     private readonly timeTrackerService: TimeTrackerService,
     private readonly hoverTimeLogService: ActiveTimeLogService,
     private readonly ngZone: NgZone,

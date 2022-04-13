@@ -12,17 +12,26 @@ export class AppClasses {
   `;
 
   public readonly wrapper: string = css`
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
     width: 100%;
     max-width: 1440px;
     padding: 20px;
     box-sizing: border-box;
   `;
 
-  public readonly controlBarWrapper: string = css`
+  public readonly barWrapper: string = css`
     margin-bottom: 1rem;
+    box-sizing: border-box;
   `;
 
-  public readonly timeLogsListWrapper: string = css`
+  public readonly listWrapper: string = css`
+    height: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    overflow-y: scroll;
     margin-top: 1rem;
   `;
 

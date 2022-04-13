@@ -1,0 +1,14 @@
+@use 'sass:map';
+
+@function get-map-field($map, $field-path) {
+  $result: $map;
+
+  @each $field in $field-path {
+    @if (type-of($result) != 'map') {
+      @error "Field '#{$field}' in path: #{$field-path} does not exist in map:" $map;
+    }
+    $result: map.get($result, $field);
+  }
+
+  @return $result;
+}

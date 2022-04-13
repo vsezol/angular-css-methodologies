@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  HostBinding,
   Input,
   OnChanges,
   OnDestroy,
@@ -15,13 +14,11 @@ import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, map, pluck, switchMap, take } from 'rxjs/operators';
 import { updateByChanges } from '../../../../functions/common/update-by-changes.function';
 import { isEmpty } from '../../../../functions/common/is-empty.function';
-import { ThemeService } from '../../../../services/theme.service';
 import { Uuid } from 'src/app/declarations/types/uuid.type';
 import { isNotNil } from 'src/app/functions/common/is-not-nil.function';
 import { LocalTimeLogsService } from '../../services/local-time-logs.service';
 import { ActiveTimeLogService } from '../../../../services/active-time-log.service';
 import { Nullable } from '../../../../declarations/types/nullable.type';
-import { TimeBarPartClasses } from './time-bar-part-classes.class';
 
 interface Inputs {
   timeLogId: Uuid;
@@ -31,13 +28,12 @@ interface Inputs {
 @Component({
   selector: 'app-time-bar-part',
   templateUrl: './time-bar-part.component.html',
+  styleUrls: ['./time-bar-part.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
   @Input() public timeLogId!: Uuid;
   @Input() public globalTimeRange!: TimeRange;
-
-  public readonly classes: TimeBarPartClasses = new TimeBarPartClasses(this.themeService);
 
   public readonly inputs$: BehaviorSubject<Inputs> = new BehaviorSubject<Inputs>({
     timeLogId: this.timeLogId,
@@ -58,18 +54,14 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
 
   private readonly subscription: Subscription = new Subscription();
 
-  @HostBinding('class')
-  public hostClasses: string[] = [];
-
   constructor(
-    private readonly themeService: ThemeService,
     private readonly localTimeLogsService: LocalTimeLogsService,
     private readonly hoverTimeLogService: ActiveTimeLogService,
     private readonly viewRef: ViewContainerRef,
     private readonly renderer: Renderer2
   ) {
     this.setHostClasses();
-    this.subscription.add(this.processHostClassWhenIsHoverChanged());
+    this.subscription.add(this.processIsHoverHostClassWhenIsHoverChanged());
   }
 
   public ngOnChanges(changes: ComponentChanges<this>): void {
@@ -91,28 +83,34 @@ export class TimeBarPartComponent implements OnChanges, OnDestroy, Inputs {
       this.inputs$.pipe(filter((inputs: Inputs) => isNotNil(inputs.timeLogId) && !isEmpty(inputs.globalTimeRange))),
       this.timeLog$
     ])
-      .pipe(
-        take(1),
-        map(([inputs, timeLog]: [Inputs, TimeLog]) => {
-          return this.classes.getBaseHost({
-            isVoid: timeLog.isVoid,
-            width: this.getWidthInPercents(timeLog.timeRange, inputs.globalTimeRange)
-          });
-        })
-      )
-      .subscribe((hostClasses: string[]) => {
-        this.hostClasses = hostClasses;
+      .pipe(take(1))
+      .subscribe(([inputs, timeLog]: [Inputs, TimeLog]) => {
+        this.setHostWidth(this.getWidthInPercents(timeLog.timeRange, inputs.globalTimeRange));
+        this.processVoidHostClass(timeLog.isVoid);
       });
   }
 
-  private processHostClassWhenIsHoverChanged(): Subscription {
+  private setHostWidth(width: number): void {
+    this.renderer.setStyle(this.viewRef.element.nativeElement, 'flex', `0 0 ${width}%`);
+  }
+
+  private processVoidHostClass(isVoid: boolean) {
+    if (isVoid) {
+      this.renderer.addClass(this.viewRef.element.nativeElement, 'void');
+      return;
+    }
+
+    this.renderer.removeClass(this.viewRef.element.nativeElement, 'void');
+  }
+
+  private processIsHoverHostClassWhenIsHoverChanged(): Subscription {
     return this.isHover$.subscribe((isHover: boolean) => {
       if (isHover) {
-        this.renderer.addClass(this.viewRef.element.nativeElement, this.classes.highlightHost);
+        this.renderer.addClass(this.viewRef.element.nativeElement, 'highlight');
         return;
       }
 
-      this.renderer.removeClass(this.viewRef.element.nativeElement, this.classes.highlightHost);
+      this.renderer.removeClass(this.viewRef.element.nativeElement, 'highlight');
     });
   }
 

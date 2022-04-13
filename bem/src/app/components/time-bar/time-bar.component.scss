@@ -1,0 +1,10 @@
+@use 'src/styles/variables' as *;
+@use 'src/styles/functions' as *;
+
+.time-bar {
+  display: flex;
+  width: 100%;
+  min-height: 40px;
+  box-sizing: border-box;
+  background-color: get-map-field($colors, [dark, 300]);
+}

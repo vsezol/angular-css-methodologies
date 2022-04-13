@@ -1,0 +1,20 @@
+@use 'src/styles/variables' as *;
+@use 'src/styles/functions' as *;
+
+:host {
+  width: 100%;
+}
+
+.input {
+  background: transparent;
+  box-sizing: border-box;
+  border: none;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  color: get-map-field($colors, [light, 0]);
+  width: 100%;
+  font-size: 0.8rem;
+  line-height: 35px;
+  height: 35px;
+}

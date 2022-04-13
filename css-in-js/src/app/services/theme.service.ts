@@ -7,7 +7,10 @@ import { ColorPath } from '../declarations/types/color-path.type';
   providedIn: 'root'
 })
 export class ThemeService {
-  constructor(@Inject(THEME_CONFIG_TOKEN) private readonly themeConfig: ThemeConfig) {}
+  constructor(
+    @Inject(THEME_CONFIG_TOKEN) private readonly themeConfig: ThemeConfig
+  ) {
+  }
 
   public getColor(path: ColorPath): string {
     if (typeof path === 'string') {

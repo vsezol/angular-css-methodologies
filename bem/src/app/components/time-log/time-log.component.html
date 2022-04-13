@@ -1,0 +1,31 @@
+<div class="time-log" *ngIf="timeLog$ | async as timeLog">
+  <ng-container>
+    <div class="time-log__description-wrapper">
+      <app-input
+        *ngIf="isEditMode$ | async; else textBlock"
+        class="time-log__description-input"
+        (blur)="handleBlur()"
+        (enter)="handleEnter()"
+        [formControl]="descriptionControl"
+      ></app-input>
+      <ng-template #textBlock>
+        <div (click)="enableEditMode()" class="time-log__description">{{ descriptionControl.value || 'Untitled' }}</div>
+      </ng-template>
+    </div>
+
+    <div class="time-log__time-wrapper">
+      <div class="time-log__time-range time-log__time-wrapper">
+        <div class="time-log__time">
+          {{ timeLog.timeRange.from | date: 'H:mm:ss' }}
+        </div>
+        <div>-</div>
+        <div class="time-log__time">
+          {{ timeLog.timeRange.to | date: 'H:mm:ss' }}
+        </div>
+      </div>
+      <div class="time-log__time-diff time-log__time">
+        {{ timeDiff$ | async | date: "H'h' m'm' s's'" }}
+      </div>
+    </div>
+  </ng-container>
+</div>
